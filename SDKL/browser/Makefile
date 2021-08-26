@@ -1,22 +1,12 @@
-# Makefile for installing Lua
-# See doc/readme.html for installation and customization instructions.
-
-# == CHANGE THE SETTINGS BELOW TO SUIT YOUR ENVIRONMENT =======================
-
-# Your platform. See PLATS for possible values.
+# Makefile for installing SDKL
 PLAT= guess
-
-# Where to install. The installation starts in the src and doc directories,
-# so take care if INSTALL_TOP is not an absolute path. See the local target.
-# You may want to make INSTALL_LMOD and INSTALL_CMOD consistent with
-# LUA_ROOT, LUA_LDIR, and LUA_CDIR in luaconf.h.
 INSTALL_TOP= /usr/local
 INSTALL_BIN= $(INSTALL_TOP)/bin
 INSTALL_INC= $(INSTALL_TOP)/include
 INSTALL_LIB= $(INSTALL_TOP)/lib
 INSTALL_MAN= $(INSTALL_TOP)/man/man1
-INSTALL_LMOD= $(INSTALL_TOP)/share/lua/$V
-INSTALL_CMOD= $(INSTALL_TOP)/lib/lua/$V
+INSTALL_LMOD= $(INSTALL_TOP)/share/sdkl/$V
+INSTALL_CMOD= $(INSTALL_TOP)/lib/sdkl/$V
 
 # How to install. If your install program does not support "-p", then
 # you may have to run ranlib on the installed liblua.a.

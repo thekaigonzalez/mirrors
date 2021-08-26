@@ -20,6 +20,8 @@ color brightblue "\<(do|end|wend|while|repeat|until|if|func|elif|elseif|then|exe
 # Keywords
 color brightyellow "\<(_G|_VERSION|assert|collectgarbage|dofile|exec|execfile|error|getfenv|getmetatable|ipairs|load|loadfile|module|readl|next|pairs|pcall|print|println|rawequal|rawget|rawlen|rawset|require|select|setfenv|setmetatable|tonumber|tostring|type|unpack|xpcall)\s*\("
 
+color brightred "include"
+
 # Standard library
 color brightyellow "\<coroutine\.(create|isyieldable|resume|running|status|wrap|yield)\>"
 color brightyellow "\<debug\.(debug|(get|set)(fenv|hook|local|metatable|(up|user)value)|getinfo|getregistry|traceback|upvalue(id|join))\>"
