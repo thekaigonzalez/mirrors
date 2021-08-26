@@ -4,7 +4,7 @@
 ## License: GPL 3 or later
 
 syntax lua "\.(lua|sl|sdkl)$"
-magic "Lua script"
+magic "SDKL-Lua script"
 comment "--"
 color brightred "\<[A-Z_][0-9A-Z_]+\>"
 
@@ -18,10 +18,10 @@ color brightyellow ":|\*|/|%|\+|-|\^|>|>=|<|<=|~=|=|\.\.|#|\<(null|not|and|or)\>
 color normal "\.\.\."
 
 # Statements
-color brightblue "\<(do|end|while|repeat|until|if|func|elseif|then|else|for|in|function|local|return|break)\>"
+color brightblue "\<(do|end|while|repeat|until|if|func|elif|elseif|then|execute|else|for|in|function|local|return|break)\>"
 
 # Keywords
-color brightyellow "\<(_G|_VERSION|assert|collectgarbage|dofile|error|getfenv|getmetatable|ipairs|load|loadfile|module|readl|next|pairs|pcall|print|println|rawequal|rawget|rawlen|rawset|require|select|setfenv|setmetatable|tonumber|tostring|type|unpack|xpcall)\s*\("
+color brightyellow "\<(_G|_VERSION|assert|collectgarbage|dofile|exec|execfile|error|getfenv|getmetatable|ipairs|load|loadfile|module|readl|next|pairs|pcall|print|println|rawequal|rawget|rawlen|rawset|require|select|setfenv|setmetatable|tonumber|tostring|type|unpack|xpcall)\s*\("
 
 # Standard library
 color brightyellow "\<coroutine\.(create|isyieldable|resume|running|status|wrap|yield)\>"
