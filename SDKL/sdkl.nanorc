@@ -18,7 +18,7 @@ color brightyellow ":|\*|/|%|\+|-|\^|>|>=|<|<=|~=|=|\.\.|#|\<(null|not|and|or)\>
 color normal "\.\.\."
 
 # Statements
-color brightblue "\<(do|end|while|repeat|until|if|func|elif|elseif|then|execute|else|for|in|function|local|return|break)\>"
+color brightblue "\<(do|end|wend|while|repeat|until|if|func|elif|elseif|then|execute|else|for|in|function|local|return|break)\>"
 
 # Keywords
 color brightyellow "\<(_G|_VERSION|assert|collectgarbage|dofile|exec|execfile|error|getfenv|getmetatable|ipairs|load|loadfile|module|readl|next|pairs|pcall|print|println|rawequal|rawget|rawlen|rawset|require|select|setfenv|setmetatable|tonumber|tostring|type|unpack|xpcall)\s*\("
