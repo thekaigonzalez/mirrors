@@ -131,7 +131,7 @@ Darwin macos macosx:
 mingw:
 	$(MAKE) "LUA_A=SDKL.dll" "LUA_T=sdkl.exe" \
 	"AR=$(CC) -shared -o" "RANLIB=strip --strip-unneeded" \
-	"SYSCFLAGS=-DLUA_BUILD_AS_DLL" "SYSLIBS=" "SYSLDFLAGS=-s" lua.exe
+	"SYSCFLAGS=-DLUA_BUILD_AS_DLL" "SYSLIBS=" "SYSLDFLAGS=-s" sdkl.exe
 	$(MAKE) "LUAC_T=sdkl-bytes.exe" sdkl-bytes.exe
 
 posix:
