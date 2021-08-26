@@ -1,8 +1,5 @@
-## Syntax highlighting for Lua.
-#
-## Original author:  Matthew Wild <mwild1 (at) gmail.com>
-## License: GPL 3 or later
-
+## Syntax highlighting for SDKL-Lua
+## Contains basic highlighting for Lua 5.4 and lower as well.
 syntax lua "\.(lua|sl|sdkl)$"
 magic "SDKL-Lua script"
 comment "--"
