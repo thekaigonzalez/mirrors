@@ -38,7 +38,7 @@ LIB_O=	lauxlib.o lbaselib.o lcorolib.o ldblib.o liolib.o lmathlib.o loadlib.o lo
 BASE_O= $(CORE_O) $(LIB_O) $(MYOBJS)
 
 LUA_T=	sdkl
-LUA_O=	lua.o
+LUA_O=	sdkl.o
 
 LUAC_T=	sdkl-bytes
 LUAC_O=	luac.o
@@ -206,7 +206,7 @@ ltable.o: ltable.c lprefix.h sdkl.h sdklconf.h ldebug.h lstate.h lobject.h \
 ltablib.o: ltablib.c lprefix.h sdkl.h sdklconf.h sdklauxillary.h sdkllib.h
 ltm.o: ltm.c lprefix.h sdkl.h sdklconf.h ldebug.h lstate.h lobject.h \
  llimits.h ltm.h lzio.h lmem.h ldo.h lgc.h lstring.h ltable.h lvm.h
-lua.o: lua.c lprefix.h sdkl.h sdklconf.h sdklauxillary.h sdkllib.h
+lua.o: sdkl.c lprefix.h sdkl.h sdklconf.h sdklauxillary.h sdkllib.h
 luac.o: luac.c lprefix.h sdkl.h sdklconf.h sdklauxillary.h ldebug.h lstate.h \
  lobject.h llimits.h ltm.h lzio.h lmem.h lopcodes.h lopnames.h lundump.h
 lundump.o: lundump.c lprefix.h sdkl.h sdklconf.h ldebug.h lstate.h \
