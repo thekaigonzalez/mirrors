@@ -1,7 +1,7 @@
 /*
 ** $Id: loslib.c $
 ** Standard Operating System library
-** See Copyright Notice in lua.h
+** See Copyright Notice in sdkl.h
 */
 
 #define loslib_c
@@ -23,10 +23,10 @@
 #define sleep(x) Sleep(1000 * (x))
 #endif
 
-#include "lua.h"
+#include "sdkl.h"
 
-#include "lauxlib.h"
-#include "lualib.h"
+#include "sdklauxillary.h"
+#include "sdkllib.h"
 
 
 /*

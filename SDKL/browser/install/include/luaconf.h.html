@@ -1,7 +1,7 @@
 /*
 ** $Id: luaconf.h $
 ** Configuration file for Lua
-** See Copyright Notice in lua.h
+** See Copyright Notice in sdkl.h
 */
 
 
@@ -196,16 +196,16 @@
 ** In Windows, any exclamation mark ('!') in the path is replaced by the
 ** path of the directory of the executable file of the current process.
 */
-#define LUA_LDIR	"!\\lua\\"
+#define LUA_LDIR	"!\\sdkl\\"
 #define LUA_CDIR	"!\\"
-#define LUA_SHRDIR	"!\\..\\share\\lua\\" LUA_VDIR "\\"
+#define LUA_SHRDIR	"!\\..\\share\\sdkl\\" LUA_VDIR "\\"
 
 #if !defined(LUA_PATH_DEFAULT)
 #define LUA_PATH_DEFAULT  \
-		LUA_LDIR"?.lua;"  LUA_LDIR"?\\init.lua;" \
-		LUA_CDIR"?.lua;"  LUA_CDIR"?\\init.lua;" \
-		LUA_SHRDIR"?.lua;" LUA_SHRDIR"?\\init.lua;" \
-		".\\?.lua;" ".\\?\\init.lua"
+		LUA_LDIR"?.sdkl;"  LUA_LDIR"?\\init.sdkl;" \
+		LUA_CDIR"?.sdkl;"  LUA_CDIR"?\\init.sdkl;" \
+		LUA_SHRDIR"?.sdkl;" LUA_SHRDIR"?\\init.sdkl;" \
+		".\\?.sdkl;" ".\\?\\init.sdkl"
 #endif
 
 #if !defined(LUA_CPATH_DEFAULT)
@@ -218,14 +218,14 @@
 #else			/* }{ */
 
 #define LUA_ROOT	"/usr/local/"
-#define LUA_LDIR	LUA_ROOT "share/lua/" LUA_VDIR "/"
-#define LUA_CDIR	LUA_ROOT "lib/lua/" LUA_VDIR "/"
+#define LUA_LDIR	LUA_ROOT "share/sdkl/" LUA_VDIR "/"
+#define LUA_CDIR	LUA_ROOT "lib/sdkl/" LUA_VDIR "/"
 
 #if !defined(LUA_PATH_DEFAULT)
 #define LUA_PATH_DEFAULT  \
-		LUA_LDIR"?.lua;"  LUA_LDIR"?/init.lua;" \
-		LUA_CDIR"?.lua;"  LUA_CDIR"?/init.lua;" \
-		"./?.lua;" "./?/init.lua"
+		LUA_LDIR"?.sdkl;"  LUA_LDIR"?/init.sdkl;" \
+		LUA_CDIR"?.sdkl;"  LUA_CDIR"?/init.sdkl;" \
+		"./?.sdkl;" "./?/sdkl.lua"
 #endif
 
 #if !defined(LUA_CPATH_DEFAULT)
