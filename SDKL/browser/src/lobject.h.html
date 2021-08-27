@@ -49,9 +49,9 @@
 typedef union Value {
   struct GCObject *gc;    /* collectable objects */
   void *p;         /* light userdata */
-  lua_CFunction f; /* light C functions */
-  lua_Integer i;   /* integer numbers */
-  lua_Number n;    /* float numbers */
+  sdkl_CFunction f; /* light C functions */
+  sdkl_Integer i;   /* integer numbers */
+  sdkl_Number n;    /* float numbers */
 } Value;
 
 
@@ -102,7 +102,7 @@ typedef struct TValue {
 ** macros using this one to be used where L is not available.
 */
 #define checkliveness(L,obj) \
-	((void)L, lua_longassert(!iscollectable(obj) || \
+	((void)L, sdkl_longassert(!iscollectable(obj) || \
 		(righttt(obj) && (L == NULL || !isdead(G(L),gcvalue(obj))))))
 
 
@@ -116,7 +116,7 @@ typedef struct TValue {
 #define setobj(L,obj1,obj2) \
 	{ TValue *io1=(obj1); const TValue *io2=(obj2); \
           io1->value_ = io2->value_; settt_(io1, io2->tt_); \
-	  checkliveness(L,io1); lua_assert(!isnonstrictnil(io1)); }
+	  checkliveness(L,io1); sdkl_assert(!isnonstrictnil(io1)); }
 
 /*
 ** Different types of assignments, according to source and destination.
@@ -253,7 +253,7 @@ typedef StackValue *StkId;
 #define thvalue(o)	check_exp(ttisthread(o), gco2th(val_(o).gc))
 
 #define setthvalue(L,obj,x) \
-  { TValue *io = (obj); lua_State *x_ = (x); \
+  { TValue *io = (obj); sdkl_State *x_ = (x); \
     val_(io).gc = obj2gco(x_); settt_(io, ctb(LUA_VTHREAD)); \
     checkliveness(L,io); }
 
@@ -326,13 +326,13 @@ typedef struct GCObject {
   { TValue *io=(obj); val_(io).n=(x); settt_(io, LUA_VNUMFLT); }
 
 #define chgfltvalue(obj,x) \
-  { TValue *io=(obj); lua_assert(ttisfloat(io)); val_(io).n=(x); }
+  { TValue *io=(obj); sdkl_assert(ttisfloat(io)); val_(io).n=(x); }
 
 #define setivalue(obj,x) \
   { TValue *io=(obj); val_(io).i=(x); settt_(io, LUA_VNUMINT); }
 
 #define chgivalue(obj,x) \
-  { TValue *io=(obj); lua_assert(ttisinteger(io)); val_(io).i=(x); }
+  { TValue *io=(obj); sdkl_assert(ttisinteger(io)); val_(io).i=(x); }
 
 /* }================================================================== */
 
@@ -633,7 +633,7 @@ typedef struct UpVal {
 
 typedef struct CClosure {
   ClosureHeader;
-  lua_CFunction f;
+  sdkl_CFunction f;
   TValue upvalue[1];  /* list of upvalues */
 } CClosure;
 
@@ -778,22 +778,22 @@ typedef struct Table {
 #define sizenode(t)	(twoto((t)->lsizenode))
 
 
-/* size of buffer for 'luaO_utf8esc' function */
+/* size of buffer for 'sdklO_utf8esc' function */
 #define UTF8BUFFSZ	8
 
-LUAI_FUNC int luaO_utf8esc (char *buff, unsigned long x);
-LUAI_FUNC int luaO_ceillog2 (unsigned int x);
-LUAI_FUNC int luaO_rawarith (lua_State *L, int op, const TValue *p1,
+LUAI_FUNC int sdklO_utf8esc (char *buff, unsigned long x);
+LUAI_FUNC int sdklO_ceillog2 (unsigned int x);
+LUAI_FUNC int sdklO_rawarith (sdkl_State *L, int op, const TValue *p1,
                              const TValue *p2, TValue *res);
-LUAI_FUNC void luaO_arith (lua_State *L, int op, const TValue *p1,
+LUAI_FUNC void sdklO_arith (sdkl_State *L, int op, const TValue *p1,
                            const TValue *p2, StkId res);
-LUAI_FUNC size_t luaO_str2num (const char *s, TValue *o);
-LUAI_FUNC int luaO_hexavalue (int c);
-LUAI_FUNC void luaO_tostring (lua_State *L, TValue *obj);
-LUAI_FUNC const char *luaO_pushvfstring (lua_State *L, const char *fmt,
+LUAI_FUNC size_t sdklO_str2num (const char *s, TValue *o);
+LUAI_FUNC int sdklO_hexavalue (int c);
+LUAI_FUNC void sdklO_tostring (sdkl_State *L, TValue *obj);
+LUAI_FUNC const char *sdklO_pushvfstring (sdkl_State *L, const char *fmt,
                                                        va_list argp);
-LUAI_FUNC const char *luaO_pushfstring (lua_State *L, const char *fmt, ...);
-LUAI_FUNC void luaO_chunkid (char *out, const char *source, size_t srclen);
+LUAI_FUNC const char *sdklO_pushfstring (sdkl_State *L, const char *fmt, ...);
+LUAI_FUNC void sdklO_chunkid (char *out, const char *source, size_t srclen);
 
 
 #endif

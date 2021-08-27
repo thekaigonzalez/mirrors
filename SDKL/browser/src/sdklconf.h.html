@@ -1,12 +1,12 @@
 /*
-** $Id: luaconf.h $
+** $Id: sdklconf.h $
 ** Configuration file for Lua
-** See Copyright Notice in lua.h
+** See Copyright Notice in sdkl.h
 */
 
 
-#ifndef luaconf_h
-#define luaconf_h
+#ifndef sdklconf_h
+#define sdklconf_h
 
 #include <limits.h>
 #include <stddef.h>
@@ -196,36 +196,36 @@
 ** In Windows, any exclamation mark ('!') in the path is replaced by the
 ** path of the directory of the executable file of the current process.
 */
-#define LUA_LDIR	"!\\lua\\"
+#define LUA_LDIR	"!\\sdkl\\"
 #define LUA_CDIR	"!\\"
-#define LUA_SHRDIR	"!\\..\\share\\lua\\" LUA_VDIR "\\"
+#define LUA_SHRDIR	"!\\..\\share\\sdkl\\" LUA_VDIR "\\"
 
 #if !defined(LUA_PATH_DEFAULT)
 #define LUA_PATH_DEFAULT  \
-		LUA_LDIR"?.lua;"  LUA_LDIR"?\\init.lua;" \
-		LUA_CDIR"?.lua;"  LUA_CDIR"?\\init.lua;" \
-		LUA_SHRDIR"?.lua;" LUA_SHRDIR"?\\init.lua;" \
-		".\\?.lua;" ".\\?\\init.lua"
+		LUA_LDIR"?.sdkl;"  LUA_LDIR"?\\init.sdkl;" \
+		LUA_CDIR"?.sdkl;"  LUA_CDIR"?\\init.sdkl;" \
+		LUA_SHRDIR"?.sdkl;" LUA_SHRDIR"?\\init.sdkl;" \
+		".\\?.sdkl;" ".\\?\\init.sdkl"
 #endif
 
 #if !defined(LUA_CPATH_DEFAULT)
 #define LUA_CPATH_DEFAULT \
 		LUA_CDIR"?.dll;" \
-		LUA_CDIR"..\\lib\\lua\\" LUA_VDIR "\\?.dll;" \
+		LUA_CDIR"..\\lib\\sdkl\\" LUA_VDIR "\\?.dll;" \
 		LUA_CDIR"loadall.dll;" ".\\?.dll"
 #endif
 
 #else			/* }{ */
 
 #define LUA_ROOT	"/usr/local/"
-#define LUA_LDIR	LUA_ROOT "share/lua/" LUA_VDIR "/"
-#define LUA_CDIR	LUA_ROOT "lib/lua/" LUA_VDIR "/"
+#define LUA_LDIR	LUA_ROOT "share/sdkl/" LUA_VDIR "/"
+#define LUA_CDIR	LUA_ROOT "lib/sdkl/" LUA_VDIR "/"
 
 #if !defined(LUA_PATH_DEFAULT)
 #define LUA_PATH_DEFAULT  \
-		LUA_LDIR"?.lua;"  LUA_LDIR"?/init.lua;" \
-		LUA_CDIR"?.lua;"  LUA_CDIR"?/init.lua;" \
-		"./?.lua;" "./?/init.lua"
+		LUA_LDIR"?.sdkl;"  LUA_LDIR"?/init.sdkl;" \
+		LUA_CDIR"?.sdkl;"  LUA_CDIR"?/init.sdkl;" \
+		"./?.sdkl;" "./?/sdkl.sdkl"
 #endif
 
 #if !defined(LUA_CPATH_DEFAULT)
@@ -341,8 +341,8 @@
 
 /*
 @@ LUA_COMPAT_APIINTCASTS controls the presence of macros for
-** manipulating other integer types (lua_pushunsigned, lua_tounsigned,
-** luaL_checkint, luaL_checklong, etc.)
+** manipulating other integer types (sdkl_pushunsigned, sdkl_tounsigned,
+** sdklL_checkint, sdklL_checklong, etc.)
 ** (These macros were also officially removed in 5.3, but they are still
 ** available here.)
 */
@@ -363,12 +363,12 @@
 ** (Once more, these macros were officially removed in 5.3, but they are
 ** still available here.)
 */
-#define lua_strlen(L,i)		lua_rawlen(L, (i))
+#define sdkl_strlen(L,i)		sdkl_rawlen(L, (i))
 
-#define lua_objlen(L,i)		lua_rawlen(L, (i))
+#define sdkl_objlen(L,i)		sdkl_rawlen(L, (i))
 
-#define lua_equal(L,idx1,idx2)		lua_compare(L,(idx1),(idx2),LUA_OPEQ)
-#define lua_lessthan(L,idx1,idx2)	lua_compare(L,(idx1),(idx2),LUA_OPLT)
+#define sdkl_equal(L,idx1,idx2)		sdkl_compare(L,(idx1),(idx2),LUA_OPEQ)
+#define sdkl_lessthan(L,idx1,idx2)	sdkl_compare(L,(idx1),(idx2),LUA_OPLT)
 
 #endif				/* } */
 
@@ -391,10 +391,10 @@
 ** by prefixing it with one of FLT/DBL/LDBL.
 @@ LUA_NUMBER_FRMLEN is the length modifier for writing floats.
 @@ LUA_NUMBER_FMT is the format for writing floats.
-@@ lua_number2str converts a float to a string.
+@@ sdkl_number2str converts a float to a string.
 @@ l_mathop allows the addition of an 'l' or 'f' to all math operations.
 @@ l_floor takes the floor of a float.
-@@ lua_str2number converts a decimal numeral to a number.
+@@ sdkl_str2number converts a decimal numeral to a number.
 */
 
 
@@ -402,19 +402,19 @@
 
 #define l_floor(x)		(l_mathop(floor)(x))
 
-#define lua_number2str(s,sz,n)  \
+#define sdkl_number2str(s,sz,n)  \
 	l_sprintf((s), sz, LUA_NUMBER_FMT, (LUAI_UACNUMBER)(n))
 
 /*
-@@ lua_numbertointeger converts a float number with an integral value
+@@ sdkl_numbertointeger converts a float number with an integral value
 ** to an integer, or returns 0 if float is not within the range of
-** a lua_Integer.  (The range comparisons are tricky because of
+** a sdkl_Integer.  (The range comparisons are tricky because of
 ** rounding. The tests here assume a two-complement representation,
 ** where MININTEGER always has an exact representation as a float;
 ** MAXINTEGER may not have one, and therefore its conversion to float
 ** may have an ill-defined value.)
 */
-#define lua_numbertointeger(n,p) \
+#define sdkl_numbertointeger(n,p) \
   ((n) >= (LUA_NUMBER)(LUA_MININTEGER) && \
    (n) < -(LUA_NUMBER)(LUA_MININTEGER) && \
       (*(p) = (LUA_INTEGER)(n), 1))
@@ -435,7 +435,7 @@
 
 #define l_mathop(op)		op##f
 
-#define lua_str2number(s,p)	strtof((s), (p))
+#define sdkl_str2number(s,p)	strtof((s), (p))
 
 
 #elif LUA_FLOAT_TYPE == LUA_FLOAT_LONGDOUBLE	/* }{ long double */
@@ -451,7 +451,7 @@
 
 #define l_mathop(op)		op##l
 
-#define lua_str2number(s,p)	strtold((s), (p))
+#define sdkl_str2number(s,p)	strtold((s), (p))
 
 #elif LUA_FLOAT_TYPE == LUA_FLOAT_DOUBLE	/* }{ double */
 
@@ -466,7 +466,7 @@
 
 #define l_mathop(op)		op
 
-#define lua_str2number(s,p)	strtod((s), (p))
+#define sdkl_str2number(s,p)	strtod((s), (p))
 
 #else						/* }{ */
 
@@ -486,7 +486,7 @@
 @@ LUA_MININTEGER is the minimum value for a LUA_INTEGER.
 @@ LUA_MAXUNSIGNED is the maximum value for a LUA_UNSIGNED.
 @@ LUA_UNSIGNEDBITS is the number of bits in a LUA_UNSIGNED.
-@@ lua_integer2str converts an integer to a string.
+@@ sdkl_integer2str converts an integer to a string.
 */
 
 
@@ -496,7 +496,7 @@
 
 #define LUAI_UACINT		LUA_INTEGER
 
-#define lua_integer2str(s,sz,n)  \
+#define sdkl_integer2str(s,sz,n)  \
 	l_sprintf((s), sz, LUA_INTEGER_FMT, (LUAI_UACINT)(n))
 
 /*
@@ -559,7 +559,7 @@
 #else				/* }{ */
 
 #error "Compiler does not support 'long long'. Use option '-DLUA_32BITS' \
-  or '-DLUA_C89_NUMBERS' (see file 'luaconf.h' for details)"
+  or '-DLUA_C89_NUMBERS' (see file 'sdklconf.h' for details)"
 
 #endif				/* } */
 
@@ -590,31 +590,31 @@
 
 
 /*
-@@ lua_strx2number converts a hexadecimal numeral to a number.
+@@ sdkl_strx2number converts a hexadecimal numeral to a number.
 ** In C99, 'strtod' does that conversion. Otherwise, you can
-** leave 'lua_strx2number' undefined and Lua will provide its own
+** leave 'sdkl_strx2number' undefined and Lua will provide its own
 ** implementation.
 */
 #if !defined(LUA_USE_C89)
-#define lua_strx2number(s,p)		lua_str2number(s,p)
+#define sdkl_strx2number(s,p)		sdkl_str2number(s,p)
 #endif
 
 
 /*
-@@ lua_pointer2str converts a pointer to a readable string in a
+@@ sdkl_pointer2str converts a pointer to a readable string in a
 ** non-specified way.
 */
-#define lua_pointer2str(buff,sz,p)	l_sprintf(buff,sz,"%p",p)
+#define sdkl_pointer2str(buff,sz,p)	l_sprintf(buff,sz,"%p",p)
 
 
 /*
-@@ lua_number2strx converts a float to a hexadecimal numeral.
+@@ sdkl_number2strx converts a float to a hexadecimal numeral.
 ** In C99, 'sprintf' (with format specifiers '%a'/'%A') does that.
-** Otherwise, you can leave 'lua_number2strx' undefined and Lua will
+** Otherwise, you can leave 'sdkl_number2strx' undefined and Lua will
 ** provide its own implementation.
 */
 #if !defined(LUA_USE_C89)
-#define lua_number2strx(L,b,sz,f,n)  \
+#define sdkl_number2strx(L,b,sz,f,n)  \
 	((void)L, l_sprintf(b,sz,f,(LUAI_UACNUMBER)(n)))
 #endif
 
@@ -627,9 +627,9 @@
 */
 #if defined(LUA_USE_C89) || (defined(HUGE_VAL) && !defined(HUGE_VALF))
 #undef l_mathop  /* variants not available */
-#undef lua_str2number
-#define l_mathop(op)		(lua_Number)op  /* no variant */
-#define lua_str2number(s,p)	((lua_Number)strtod((s), (p)))
+#undef sdkl_str2number
+#define l_mathop(op)		(sdkl_Number)op  /* no variant */
+#define sdkl_str2number(s,p)	((sdkl_Number)strtod((s), (p)))
 #endif
 
 
@@ -652,12 +652,12 @@
 
 
 /*
-@@ lua_getlocaledecpoint gets the locale "radix character" (decimal point).
+@@ sdkl_getlocaledecpoint gets the locale "radix character" (decimal point).
 ** Change that if you do not want to use C locales. (Code using this
 ** macro must include the header 'locale.h'.)
 */
-#if !defined(lua_getlocaledecpoint)
-#define lua_getlocaledecpoint()		(localeconv()->decimal_point[0])
+#if !defined(sdkl_getlocaledecpoint)
+#define sdkl_getlocaledecpoint()		(localeconv()->decimal_point[0])
 #endif
 
 
@@ -667,14 +667,14 @@
 ** Define LUA_NOBUILTIN if you do not want '__builtin_expect' in your
 ** code.)
 */
-#if !defined(luai_likely)
+#if !defined(sdkli_likely)
 
 #if defined(__GNUC__) && !defined(LUA_NOBUILTIN)
-#define luai_likely(x)		(__builtin_expect(((x) != 0), 1))
-#define luai_unlikely(x)	(__builtin_expect(((x) != 0), 0))
+#define sdkli_likely(x)		(__builtin_expect(((x) != 0), 1))
+#define sdkli_unlikely(x)	(__builtin_expect(((x) != 0), 0))
 #else
-#define luai_likely(x)		(x)
-#define luai_unlikely(x)	(x)
+#define sdkli_likely(x)		(x)
+#define sdkli_unlikely(x)	(x)
 #endif
 
 #endif
@@ -682,8 +682,8 @@
 
 #if defined(LUA_CORE) || defined(LUA_LIB)
 /* shorter names for Lua's own use */
-#define l_likely(x)	luai_likely(x)
-#define l_unlikely(x)	luai_unlikely(x)
+#define l_likely(x)	sdkli_likely(x)
+#define l_unlikely(x)	sdkli_unlikely(x)
 #endif
 
 
@@ -713,7 +713,7 @@
 */
 #if defined(LUA_USE_APICHECK)
 #include <assert.h>
-#define luai_apicheck(l,e)	assert(e)
+#define sdkli_apicheck(l,e)	assert(e)
 #endif
 
 /* }================================================================== */
@@ -760,14 +760,14 @@
 /*
 @@ LUAL_BUFFERSIZE is the buffer size used by the lauxlib buffer system.
 */
-#define LUAL_BUFFERSIZE   ((int)(16 * sizeof(void*) * sizeof(lua_Number)))
+#define LUAL_BUFFERSIZE   ((int)(16 * sizeof(void*) * sizeof(sdkl_Number)))
 
 
 /*
 @@ LUAI_MAXALIGN defines fields that, when used in a union, ensure
 ** maximum alignment for the other items in that union.
 */
-#define LUAI_MAXALIGN  lua_Number n; double u; void *s; lua_Integer i; long l
+#define LUAI_MAXALIGN  sdkl_Number n; double u; void *s; sdkl_Integer i; long l
 
 /* }================================================================== */
 

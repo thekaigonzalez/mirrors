@@ -47,17 +47,17 @@
 #define CLOSEKTOP	(-1)
 
 
-LUAI_FUNC Proto *luaF_newproto (lua_State *L);
-LUAI_FUNC CClosure *luaF_newCclosure (lua_State *L, int nupvals);
-LUAI_FUNC LClosure *luaF_newLclosure (lua_State *L, int nupvals);
-LUAI_FUNC void luaF_initupvals (lua_State *L, LClosure *cl);
-LUAI_FUNC UpVal *luaF_findupval (lua_State *L, StkId level);
-LUAI_FUNC void luaF_newtbcupval (lua_State *L, StkId level);
-LUAI_FUNC void luaF_closeupval (lua_State *L, StkId level);
-LUAI_FUNC void luaF_close (lua_State *L, StkId level, int status, int yy);
-LUAI_FUNC void luaF_unlinkupval (UpVal *uv);
-LUAI_FUNC void luaF_freeproto (lua_State *L, Proto *f);
-LUAI_FUNC const char *luaF_getlocalname (const Proto *func, int local_number,
+LUAI_FUNC Proto *sdklF_newproto (sdkl_State *L);
+LUAI_FUNC CClosure *sdklF_newCclosure (sdkl_State *L, int nupvals);
+LUAI_FUNC LClosure *sdklF_newLclosure (sdkl_State *L, int nupvals);
+LUAI_FUNC void sdklF_initupvals (sdkl_State *L, LClosure *cl);
+LUAI_FUNC UpVal *sdklF_findupval (sdkl_State *L, StkId level);
+LUAI_FUNC void sdklF_newtbcupval (sdkl_State *L, StkId level);
+LUAI_FUNC void sdklF_closeupval (sdkl_State *L, StkId level);
+LUAI_FUNC void sdklF_close (sdkl_State *L, StkId level, int status, int yy);
+LUAI_FUNC void sdklF_unlinkupval (UpVal *uv);
+LUAI_FUNC void sdklF_freeproto (sdkl_State *L, Proto *f);
+LUAI_FUNC const char *sdklF_getlocalname (const Proto *func, int local_number,
                                          int pc);
 
 

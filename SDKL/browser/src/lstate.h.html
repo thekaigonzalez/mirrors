@@ -41,7 +41,7 @@
 ** 'finobjrold' -> NULL: really old       """".
 **
 ** All lists can contain elements older than their main ages, due
-** to 'luaC_checkfinalizer' and 'udata2finalize', which move
+** to 'sdklC_checkfinalizer' and 'udata2finalize', which move
 ** objects between the normal lists and the "marked for finalization"
 ** lists. Moreover, barriers can age young objects in young lists as
 ** OLD0, which then become OLD1. However, a list never contains
@@ -114,11 +114,11 @@
 
 
 
-struct lua_longjmp;  /* defined in ldo.c */
+struct sdkl_longjmp;  /* defined in ldo.c */
 
 
 /*
-** Atomic type (relative to signals) to better ensure that 'lua_sethook'
+** Atomic type (relative to signals) to better ensure that 'sdkl_sethook'
 ** is thread safe
 */
 #if !defined(l_signalT)
@@ -180,9 +180,9 @@ typedef struct CallInfo {
       int nextraargs;  /* # of extra arguments in vararg functions */
     } l;
     struct {  /* only for C functions */
-      lua_KFunction k;  /* continuation in case of yields */
+      sdkl_KFunction k;  /* continuation in case of yields */
       ptrdiff_t old_errfunc;
-      lua_KContext ctx;  /* context info. in case of yields */
+      sdkl_KContext ctx;  /* context info. in case of yields */
     } c;
   } u;
   union {
@@ -204,7 +204,7 @@ typedef struct CallInfo {
 */
 #define CIST_OAH	(1<<0)	/* original value of 'allowhook' */
 #define CIST_C		(1<<1)	/* call is running a C function */
-#define CIST_FRESH	(1<<2)	/* call is on a fresh "luaV_execute" frame */
+#define CIST_FRESH	(1<<2)	/* call is on a fresh "sdklV_execute" frame */
 #define CIST_HOOKED	(1<<3)	/* call is running a debug hook */
 #define CIST_YPCALL	(1<<4)	/* doing a yieldable protected call */
 #define CIST_TAIL	(1<<5)	/* call was tail called */
@@ -247,7 +247,7 @@ typedef struct CallInfo {
 ** 'global state', shared by all threads of this state
 */
 typedef struct global_State {
-  lua_Alloc frealloc;  /* function to reallocate memory */
+  sdkl_Alloc frealloc;  /* function to reallocate memory */
   void *ud;         /* auxiliary data to 'frealloc' */
   l_mem totalbytes;  /* number of bytes currently allocated - GCdebt */
   l_mem GCdebt;  /* bytes allocated not yet compensated by the collector */
@@ -286,14 +286,14 @@ typedef struct global_State {
   GCObject *finobjsur;  /* list of survival objects with finalizers */
   GCObject *finobjold1;  /* list of old1 objects with finalizers */
   GCObject *finobjrold;  /* list of really old objects with finalizers */
-  struct lua_State *twups;  /* list of threads with open upvalues */
-  lua_CFunction panic;  /* to be called in unprotected errors */
-  struct lua_State *mainthread;
+  struct sdkl_State *twups;  /* list of threads with open upvalues */
+  sdkl_CFunction panic;  /* to be called in unprotected errors */
+  struct sdkl_State *mainthread;
   TString *memerrmsg;  /* message for memory-allocation errors */
   TString *tmname[TM_N];  /* array with tag-method names */
   struct Table *mt[LUA_NUMTAGS];  /* metatables for basic types */
   TString *strcache[STRCACHE_N][STRCACHE_M];  /* cache for strings in API */
-  lua_WarnFunction warnf;  /* warning function */
+  sdkl_WarnFunction warnf;  /* warning function */
   void *ud_warn;         /* auxiliary data to 'warnf' */
 } global_State;
 
@@ -301,7 +301,7 @@ typedef struct global_State {
 /*
 ** 'per thread' state
 */
-struct lua_State {
+struct sdkl_State {
   CommonHeader;
   lu_byte status;
   lu_byte allowhook;
@@ -314,10 +314,10 @@ struct lua_State {
   UpVal *openupval;  /* list of open upvalues in this stack */
   StkId tbclist;  /* list of to-be-closed variables */
   GCObject *gclist;
-  struct lua_State *twups;  /* list of threads with open upvalues */
-  struct lua_longjmp *errorJmp;  /* current error recover point */
+  struct sdkl_State *twups;  /* list of threads with open upvalues */
+  struct sdkl_longjmp *errorJmp;  /* current error recover point */
   CallInfo base_ci;  /* CallInfo for first level (C calling Lua) */
-  volatile lua_Hook hook;
+  volatile sdkl_Hook hook;
   ptrdiff_t errfunc;  /* current error handling function (stack index) */
   l_uint32 nCcalls;  /* number of nested (non-yieldable | C)  calls */
   int oldpc;  /* last pc traced */
@@ -352,7 +352,7 @@ union GCUnion {
   union Closure cl;
   struct Table h;
   struct Proto p;
-  struct lua_State th;  /* thread */
+  struct sdkl_State th;  /* thread */
   struct UpVal upv;
 };
 
@@ -388,16 +388,16 @@ union GCUnion {
 /* actual number of total bytes allocated */
 #define gettotalbytes(g)	cast(lu_mem, (g)->totalbytes + (g)->GCdebt)
 
-LUAI_FUNC void luaE_setdebt (global_State *g, l_mem debt);
-LUAI_FUNC void luaE_freethread (lua_State *L, lua_State *L1);
-LUAI_FUNC CallInfo *luaE_extendCI (lua_State *L);
-LUAI_FUNC void luaE_freeCI (lua_State *L);
-LUAI_FUNC void luaE_shrinkCI (lua_State *L);
-LUAI_FUNC void luaE_checkcstack (lua_State *L);
-LUAI_FUNC void luaE_incCstack (lua_State *L);
-LUAI_FUNC void luaE_warning (lua_State *L, const char *msg, int tocont);
-LUAI_FUNC void luaE_warnerror (lua_State *L, const char *where);
-LUAI_FUNC int luaE_resetthread (lua_State *L, int status);
+LUAI_FUNC void sdklE_setdebt (global_State *g, l_mem debt);
+LUAI_FUNC void sdklE_freethread (sdkl_State *L, sdkl_State *L1);
+LUAI_FUNC CallInfo *sdklE_extendCI (sdkl_State *L);
+LUAI_FUNC void sdklE_freeCI (sdkl_State *L);
+LUAI_FUNC void sdklE_shrinkCI (sdkl_State *L);
+LUAI_FUNC void sdklE_checkcstack (sdkl_State *L);
+LUAI_FUNC void sdklE_incCstack (sdkl_State *L);
+LUAI_FUNC void sdklE_warning (sdkl_State *L, const char *msg, int tocont);
+LUAI_FUNC void sdklE_warnerror (sdkl_State *L, const char *where);
+LUAI_FUNC int sdklE_resetthread (sdkl_State *L, int status);
 
 
 #endif

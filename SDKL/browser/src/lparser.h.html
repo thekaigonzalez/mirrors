@@ -68,8 +68,8 @@ typedef enum {
 typedef struct expdesc {
   expkind k;
   union {
-    lua_Integer ival;    /* for VKINT */
-    lua_Number nval;  /* for VKFLT */
+    sdkl_Integer ival;    /* for VKINT */
+    sdkl_Number nval;  /* for VKFLT */
     TString *strval;  /* for VKSTR */
     int info;  /* for generic use */
     struct {  /* for indexed variables */
@@ -163,8 +163,8 @@ typedef struct FuncState {
 } FuncState;
 
 
-LUAI_FUNC int luaY_nvarstack (FuncState *fs);
-LUAI_FUNC LClosure *luaY_parser (lua_State *L, ZIO *z, Mbuffer *buff,
+LUAI_FUNC int sdklY_nvarstack (FuncState *fs);
+LUAI_FUNC LClosure *sdklY_parser (sdkl_State *L, ZIO *z, Mbuffer *buff,
                                  Dyndata *dyd, const char *name, int firstchar);
 
 

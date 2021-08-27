@@ -25,21 +25,21 @@
 #include "lzio.h"
 
 
-#if !defined(luai_verifycode)
-#define luai_verifycode(L,f)  /* empty */
+#if !defined(sdkli_verifycode)
+#define sdkli_verifycode(L,f)  /* empty */
 #endif
 
 
 typedef struct {
-  lua_State *L;
+  sdkl_State *L;
   ZIO *Z;
   const char *name;
 } LoadState;
 
 
 static l_noret error (LoadState *S, const char *why) {
-  luaO_pushfstring(S->L, "%s: bad binary format (%s)", S->name, why);
-  luaD_throw(S->L, LUA_ERRSYNTAX);
+  sdklO_pushfstring(S->L, "%s: bad binary format (%s)", S->name, why);
+  sdklD_throw(S->L, LUA_ERRSYNTAX);
 }
 
 
@@ -50,7 +50,7 @@ static l_noret error (LoadState *S, const char *why) {
 #define loadVector(S,b,n)	loadBlock(S,b,(n)*sizeof((b)[0]))
 
 static void loadBlock (LoadState *S, void *b, size_t size) {
-  if (luaZ_read(S->Z, b, size) != 0)
+  if (sdklZ_read(S->Z, b, size) != 0)
     error(S, "truncated chunk");
 }
 
@@ -90,15 +90,15 @@ static int loadInt (LoadState *S) {
 }
 
 
-static lua_Number loadNumber (LoadState *S) {
-  lua_Number x;
+static sdkl_Number loadNumber (LoadState *S) {
+  sdkl_Number x;
   loadVar(S, x);
   return x;
 }
 
 
-static lua_Integer loadInteger (LoadState *S) {
-  lua_Integer x;
+static sdkl_Integer loadInteger (LoadState *S) {
+  sdkl_Integer x;
   loadVar(S, x);
   return x;
 }
@@ -108,7 +108,7 @@ static lua_Integer loadInteger (LoadState *S) {
 ** Load a nullable string into prototype 'p'.
 */
 static TString *loadStringN (LoadState *S, Proto *p) {
-  lua_State *L = S->L;
+  sdkl_State *L = S->L;
   TString *ts;
   size_t size = loadSize(S);
   if (size == 0)  /* no string? */
@@ -116,16 +116,16 @@ static TString *loadStringN (LoadState *S, Proto *p) {
   else if (--size <= LUAI_MAXSHORTLEN) {  /* short string? */
     char buff[LUAI_MAXSHORTLEN];
     loadVector(S, buff, size);  /* load string into buffer */
-    ts = luaS_newlstr(L, buff, size);  /* create string */
+    ts = sdklS_newlstr(L, buff, size);  /* create string */
   }
   else {  /* long string */
-    ts = luaS_createlngstrobj(L, size);  /* create string */
+    ts = sdklS_createlngstrobj(L, size);  /* create string */
     setsvalue2s(L, L->top, ts);  /* anchor it ('loadVector' can GC) */
-    luaD_inctop(L);
+    sdklD_inctop(L);
     loadVector(S, getstr(ts), size);  /* load directly in final place */
     L->top--;  /* pop string */
   }
-  luaC_objbarrier(L, p, ts);
+  sdklC_objbarrier(L, p, ts);
   return ts;
 }
 
@@ -143,7 +143,7 @@ static TString *loadString (LoadState *S, Proto *p) {
 
 static void loadCode (LoadState *S, Proto *f) {
   int n = loadInt(S);
-  f->code = luaM_newvectorchecked(S->L, n, Instruction);
+  f->code = sdklM_newvectorchecked(S->L, n, Instruction);
   f->sizecode = n;
   loadVector(S, f->code, n);
 }
@@ -155,7 +155,7 @@ static void loadFunction(LoadState *S, Proto *f, TString *psource);
 static void loadConstants (LoadState *S, Proto *f) {
   int i;
   int n = loadInt(S);
-  f->k = luaM_newvectorchecked(S->L, n, TValue);
+  f->k = sdklM_newvectorchecked(S->L, n, TValue);
   f->sizek = n;
   for (i = 0; i < n; i++)
     setnilvalue(&f->k[i]);
@@ -182,7 +182,7 @@ static void loadConstants (LoadState *S, Proto *f) {
       case LUA_VLNGSTR:
         setsvalue2n(S->L, o, loadString(S, f));
         break;
-      default: lua_assert(0);
+      default: sdkl_assert(0);
     }
   }
 }
@@ -191,13 +191,13 @@ static void loadConstants (LoadState *S, Proto *f) {
 static void loadProtos (LoadState *S, Proto *f) {
   int i;
   int n = loadInt(S);
-  f->p = luaM_newvectorchecked(S->L, n, Proto *);
+  f->p = sdklM_newvectorchecked(S->L, n, Proto *);
   f->sizep = n;
   for (i = 0; i < n; i++)
     f->p[i] = NULL;
   for (i = 0; i < n; i++) {
-    f->p[i] = luaF_newproto(S->L);
-    luaC_objbarrier(S->L, f, f->p[i]);
+    f->p[i] = sdklF_newproto(S->L);
+    sdklC_objbarrier(S->L, f, f->p[i]);
     loadFunction(S, f->p[i], f->source);
   }
 }
@@ -212,7 +212,7 @@ static void loadProtos (LoadState *S, Proto *f) {
 static void loadUpvalues (LoadState *S, Proto *f) {
   int i, n;
   n = loadInt(S);
-  f->upvalues = luaM_newvectorchecked(S->L, n, Upvaldesc);
+  f->upvalues = sdklM_newvectorchecked(S->L, n, Upvaldesc);
   f->sizeupvalues = n;
   for (i = 0; i < n; i++)  /* make array valid for GC */
     f->upvalues[i].name = NULL;
@@ -227,18 +227,18 @@ static void loadUpvalues (LoadState *S, Proto *f) {
 static void loadDebug (LoadState *S, Proto *f) {
   int i, n;
   n = loadInt(S);
-  f->lineinfo = luaM_newvectorchecked(S->L, n, ls_byte);
+  f->lineinfo = sdklM_newvectorchecked(S->L, n, ls_byte);
   f->sizelineinfo = n;
   loadVector(S, f->lineinfo, n);
   n = loadInt(S);
-  f->abslineinfo = luaM_newvectorchecked(S->L, n, AbsLineInfo);
+  f->abslineinfo = sdklM_newvectorchecked(S->L, n, AbsLineInfo);
   f->sizeabslineinfo = n;
   for (i = 0; i < n; i++) {
     f->abslineinfo[i].pc = loadInt(S);
     f->abslineinfo[i].line = loadInt(S);
   }
   n = loadInt(S);
-  f->locvars = luaM_newvectorchecked(S->L, n, LocVar);
+  f->locvars = sdklM_newvectorchecked(S->L, n, LocVar);
   f->sizelocvars = n;
   for (i = 0; i < n; i++)
     f->locvars[i].varname = NULL;
@@ -281,7 +281,7 @@ static void checkliteral (LoadState *S, const char *s, const char *msg) {
 
 static void fchecksize (LoadState *S, size_t size, const char *tname) {
   if (loadByte(S) != size)
-    error(S, luaO_pushfstring(S->L, "%s size mismatch", tname));
+    error(S, sdklO_pushfstring(S->L, "%s size mismatch", tname));
 }
 
 
@@ -296,8 +296,8 @@ static void checkHeader (LoadState *S) {
     error(S, "format mismatch");
   checkliteral(S, LUAC_DATA, "corrupted chunk");
   checksize(S, Instruction);
-  checksize(S, lua_Integer);
-  checksize(S, lua_Number);
+  checksize(S, sdkl_Integer);
+  checksize(S, sdkl_Number);
   if (loadInteger(S) != LUAC_INT)
     error(S, "integer format mismatch");
   if (loadNumber(S) != LUAC_NUM)
@@ -308,7 +308,7 @@ static void checkHeader (LoadState *S) {
 /*
 ** Load precompiled chunk.
 */
-LClosure *luaU_undump(lua_State *L, ZIO *Z, const char *name) {
+LClosure *sdklU_undump(sdkl_State *L, ZIO *Z, const char *name) {
   LoadState S;
   LClosure *cl;
   if (*name == '@' || *name == '=')
@@ -320,14 +320,14 @@ LClosure *luaU_undump(lua_State *L, ZIO *Z, const char *name) {
   S.L = L;
   S.Z = Z;
   checkHeader(&S);
-  cl = luaF_newLclosure(L, loadByte(&S));
+  cl = sdklF_newLclosure(L, loadByte(&S));
   setclLvalue2s(L, L->top, cl);
-  luaD_inctop(L);
-  cl->p = luaF_newproto(L);
-  luaC_objbarrier(L, cl, cl->p);
+  sdklD_inctop(L);
+  cl->p = sdklF_newproto(L);
+  sdklC_objbarrier(L, cl, cl->p);
   loadFunction(&S, cl->p, NULL);
-  lua_assert(cl->nupvalues == cl->p->sizeupvalues);
-  luai_verifycode(L, cl->p);
+  sdkl_assert(cl->nupvalues == cl->p->sizeupvalues);
+  sdkli_verifycode(L, cl->p);
   return cl;
 }
 

@@ -51,7 +51,7 @@
 ** between 2^MAXABITS and the maximum size that, measured in bytes,
 ** fits in a 'size_t'.
 */
-#define MAXASIZE	luaM_limitN(1u << MAXABITS, TValue)
+#define MAXASIZE	sdklM_limitN(1u << MAXABITS, TValue)
 
 /*
 ** MAXHBITS is the largest integer such that 2^MAXHBITS fits in a
@@ -65,7 +65,7 @@
 ** between 2^MAXHBITS and the maximum size such that, measured in bytes,
 ** it fits in a 'size_t'.
 */
-#define MAXHSIZE	luaM_limitN(1u << MAXHBITS, Node)
+#define MAXHSIZE	sdklM_limitN(1u << MAXHBITS, Node)
 
 
 /*
@@ -116,12 +116,12 @@ static const TValue absentkey = {ABSTKEYCONSTANT};
 ** INT_MIN.
 */
 #if !defined(l_hashfloat)
-static int l_hashfloat (lua_Number n) {
+static int l_hashfloat (sdkl_Number n) {
   int i;
-  lua_Integer ni;
+  sdkl_Integer ni;
   n = l_mathop(frexp)(n, &i) * -cast_num(INT_MIN);
-  if (!lua_numbertointeger(n, &ni)) {  /* is 'n' inf/-inf/NaN? */
-    lua_assert(luai_numisnan(n) || l_mathop(fabs)(n) == cast_num(HUGE_VAL));
+  if (!sdkl_numbertointeger(n, &ni)) {  /* is 'n' inf/-inf/NaN? */
+    sdkl_assert(sdkli_numisnan(n) || l_mathop(fabs)(n) == cast_num(HUGE_VAL));
     return 0;
   }
   else {  /* normal case */
@@ -141,11 +141,11 @@ static int l_hashfloat (lua_Number n) {
 static Node *mainposition (const Table *t, int ktt, const Value *kvl) {
   switch (withvariant(ktt)) {
     case LUA_VNUMINT: {
-      lua_Integer key = ivalueraw(*kvl);
+      sdkl_Integer key = ivalueraw(*kvl);
       return hashint(t, key);
     }
     case LUA_VNUMFLT: {
-      lua_Number n = fltvalueraw(*kvl);
+      sdkl_Number n = fltvalueraw(*kvl);
       return hashmod(t, l_hashfloat(n));
     }
     case LUA_VSHRSTR: {
@@ -154,7 +154,7 @@ static Node *mainposition (const Table *t, int ktt, const Value *kvl) {
     }
     case LUA_VLNGSTR: {
       TString *ts = tsvalueraw(*kvl);
-      return hashpow2(t, luaS_hashlongstr(ts));
+      return hashpow2(t, sdklS_hashlongstr(ts));
     }
     case LUA_VFALSE:
       return hashboolean(t, 0);
@@ -165,7 +165,7 @@ static Node *mainposition (const Table *t, int ktt, const Value *kvl) {
       return hashpointer(t, p);
     }
     case LUA_VLCF: {
-      lua_CFunction f = fvalueraw(*kvl);
+      sdkl_CFunction f = fvalueraw(*kvl);
       return hashpointer(t, f);
     }
     default: {
@@ -214,13 +214,13 @@ static int equalkey (const TValue *k1, const Node *n2, int deadok) {
     case LUA_VNUMINT:
       return (ivalue(k1) == keyival(n2));
     case LUA_VNUMFLT:
-      return luai_numeq(fltvalue(k1), fltvalueraw(keyval(n2)));
+      return sdkli_numeq(fltvalue(k1), fltvalueraw(keyval(n2)));
     case LUA_VLIGHTUSERDATA:
       return pvalue(k1) == pvalueraw(keyval(n2));
     case LUA_VLCF:
       return fvalue(k1) == fvalueraw(keyval(n2));
     case ctb(LUA_VLNGSTR):
-      return luaS_eqlngstr(tsvalue(k1), keystrval(n2));
+      return sdklS_eqlngstr(tsvalue(k1), keystrval(n2));
     default:
       return gcvalue(k1) == gcvalueraw(keyval(n2));
   }
@@ -238,7 +238,7 @@ static int equalkey (const TValue *k1, const Node *n2, int deadok) {
 /*
 ** Returns the real size of the 'array' array
 */
-LUAI_FUNC unsigned int luaH_realasize (const Table *t) {
+LUAI_FUNC unsigned int sdklH_realasize (const Table *t) {
   if (limitequalsasize(t))
     return t->alimit;  /* this is the size */
   else {
@@ -253,7 +253,7 @@ LUAI_FUNC unsigned int luaH_realasize (const Table *t) {
     size |= (size >> 32);  /* unsigned int has more than 32 bits */
 #endif
     size++;
-    lua_assert(ispow2(size) && size/2 < t->alimit && t->alimit < size);
+    sdkl_assert(ispow2(size) && size/2 < t->alimit && t->alimit < size);
     return size;
   }
 }
@@ -270,7 +270,7 @@ static int ispow2realasize (const Table *t) {
 
 
 static unsigned int setlimittosize (Table *t) {
-  t->alimit = luaH_realasize(t);
+  t->alimit = sdklH_realasize(t);
   setrealasize(t);
   return t->alimit;
 }
@@ -304,7 +304,7 @@ static const TValue *getgeneric (Table *t, const TValue *key, int deadok) {
 ** returns the index for 'k' if 'k' is an appropriate key to live in
 ** the array part of a table, 0 otherwise.
 */
-static unsigned int arrayindex (lua_Integer k) {
+static unsigned int arrayindex (sdkl_Integer k) {
   if (l_castS2U(k) - 1u < MAXASIZE)  /* 'k' in [1, MAXASIZE]? */
     return cast_uint(k);  /* 'key' is an appropriate array index */
   else
@@ -317,7 +317,7 @@ static unsigned int arrayindex (lua_Integer k) {
 ** elements in the array part, then elements in the hash part. The
 ** beginning of a traversal is signaled by 0.
 */
-static unsigned int findindex (lua_State *L, Table *t, TValue *key,
+static unsigned int findindex (sdkl_State *L, Table *t, TValue *key,
                                unsigned int asize) {
   unsigned int i;
   if (ttisnil(key)) return 0;  /* first iteration */
@@ -327,7 +327,7 @@ static unsigned int findindex (lua_State *L, Table *t, TValue *key,
   else {
     const TValue *n = getgeneric(t, key, 1);
     if (l_unlikely(isabstkey(n)))
-      luaG_runerror(L, "invalid key to 'next'");  /* key not found */
+      sdklG_runerror(L, "invalid key to 'next'");  /* key not found */
     i = cast_int(nodefromval(n) - gnode(t, 0));  /* key index in hash table */
     /* hash elements are numbered after array ones */
     return (i + 1) + asize;
@@ -335,8 +335,8 @@ static unsigned int findindex (lua_State *L, Table *t, TValue *key,
 }
 
 
-int luaH_next (lua_State *L, Table *t, StkId key) {
-  unsigned int asize = luaH_realasize(t);
+int sdklH_next (sdkl_State *L, Table *t, StkId key) {
+  unsigned int asize = sdklH_realasize(t);
   unsigned int i = findindex(L, t, s2v(key), asize);  /* find original key */
   for (; i < asize; i++) {  /* try first array part */
     if (!isempty(&t->array[i])) {  /* a non-empty entry? */
@@ -357,9 +357,9 @@ int luaH_next (lua_State *L, Table *t, StkId key) {
 }
 
 
-static void freehash (lua_State *L, Table *t) {
+static void freehash (sdkl_State *L, Table *t) {
   if (!isdummy(t))
-    luaM_freearray(L, t->node, cast_sizet(sizenode(t)));
+    sdklM_freearray(L, t->node, cast_sizet(sizenode(t)));
 }
 
 
@@ -393,16 +393,16 @@ static unsigned int computesizes (unsigned int nums[], unsigned int *pna) {
       na = a;  /* all elements up to 'optimal' will go to array part */
     }
   }
-  lua_assert((optimal == 0 || optimal / 2 < na) && na <= optimal);
+  sdkl_assert((optimal == 0 || optimal / 2 < na) && na <= optimal);
   *pna = na;
   return optimal;
 }
 
 
-static int countint (lua_Integer key, unsigned int *nums) {
+static int countint (sdkl_Integer key, unsigned int *nums) {
   unsigned int k = arrayindex(key);
   if (k != 0) {  /* is 'key' an appropriate array index? */
-    nums[luaO_ceillog2(k)]++;  /* count as such */
+    nums[sdklO_ceillog2(k)]++;  /* count as such */
     return 1;
   }
   else
@@ -466,7 +466,7 @@ static int numusehash (const Table *t, unsigned int *nums, unsigned int *pna) {
 ** comparison ensures that the shift in the second one does not
 ** overflow.
 */
-static void setnodevector (lua_State *L, Table *t, unsigned int size) {
+static void setnodevector (sdkl_State *L, Table *t, unsigned int size) {
   if (size == 0) {  /* no elements to hash part? */
     t->node = cast(Node *, dummynode);  /* use common 'dummynode' */
     t->lsizenode = 0;
@@ -474,11 +474,11 @@ static void setnodevector (lua_State *L, Table *t, unsigned int size) {
   }
   else {
     int i;
-    int lsize = luaO_ceillog2(size);
+    int lsize = sdklO_ceillog2(size);
     if (lsize > MAXHBITS || (1u << lsize) > MAXHSIZE)
-      luaG_runerror(L, "table overflow");
+      sdklG_runerror(L, "table overflow");
     size = twoto(lsize);
-    t->node = luaM_newvector(L, size, Node);
+    t->node = sdklM_newvector(L, size, Node);
     for (i = 0; i < (int)size; i++) {
       Node *n = gnode(t, i);
       gnext(n) = 0;
@@ -494,7 +494,7 @@ static void setnodevector (lua_State *L, Table *t, unsigned int size) {
 /*
 ** (Re)insert all elements from the hash part of 'ot' into table 't'.
 */
-static void reinsert (lua_State *L, Table *ot, Table *t) {
+static void reinsert (sdkl_State *L, Table *ot, Table *t) {
   int j;
   int size = sizenode(ot);
   for (j = 0; j < size; j++) {
@@ -504,7 +504,7 @@ static void reinsert (lua_State *L, Table *ot, Table *t) {
          already present in the table */
       TValue k;
       getnodekey(L, &k, old);
-      luaH_set(L, t, &k, gval(old));
+      sdklH_set(L, t, &k, gval(old));
     }
   }
 }
@@ -539,7 +539,7 @@ static void exchangehashpart (Table *t1, Table *t2) {
 ** nils and reinserts the elements of the old hash back into the new
 ** parts of the table.
 */
-void luaH_resize (lua_State *L, Table *t, unsigned int newasize,
+void sdklH_resize (sdkl_State *L, Table *t, unsigned int newasize,
                                           unsigned int nhsize) {
   unsigned int i;
   Table newt;  /* to keep the new hash part */
@@ -553,16 +553,16 @@ void luaH_resize (lua_State *L, Table *t, unsigned int newasize,
     /* re-insert into the new hash the elements from vanishing slice */
     for (i = newasize; i < oldasize; i++) {
       if (!isempty(&t->array[i]))
-        luaH_setint(L, t, i + 1, &t->array[i]);
+        sdklH_setint(L, t, i + 1, &t->array[i]);
     }
     t->alimit = oldasize;  /* restore current size... */
     exchangehashpart(t, &newt);  /* and hash (in case of errors) */
   }
   /* allocate new array */
-  newarray = luaM_reallocvector(L, t->array, oldasize, newasize, TValue);
+  newarray = sdklM_reallocvector(L, t->array, oldasize, newasize, TValue);
   if (l_unlikely(newarray == NULL && newasize > 0)) {  /* allocation failed? */
     freehash(L, &newt);  /* release new hash part */
-    luaM_error(L);  /* raise error (with array unchanged) */
+    sdklM_error(L);  /* raise error (with array unchanged) */
   }
   /* allocation ok; initialize new part of the array */
   exchangehashpart(t, &newt);  /* 't' has the new hash ('newt' has the old) */
@@ -576,15 +576,15 @@ void luaH_resize (lua_State *L, Table *t, unsigned int newasize,
 }
 
 
-void luaH_resizearray (lua_State *L, Table *t, unsigned int nasize) {
+void sdklH_resizearray (sdkl_State *L, Table *t, unsigned int nasize) {
   int nsize = allocsizenode(t);
-  luaH_resize(L, t, nasize, nsize);
+  sdklH_resize(L, t, nasize, nsize);
 }
 
 /*
 ** nums[i] = number of keys 'k' where 2^(i - 1) < k <= 2^i
 */
-static void rehash (lua_State *L, Table *t, const TValue *ek) {
+static void rehash (sdkl_State *L, Table *t, const TValue *ek) {
   unsigned int asize;  /* optimal size for array part */
   unsigned int na;  /* number of keys in the array part */
   unsigned int nums[MAXABITS + 1];
@@ -602,7 +602,7 @@ static void rehash (lua_State *L, Table *t, const TValue *ek) {
   /* compute new size for array part */
   asize = computesizes(nums, &na);
   /* resize the table to new computed sizes */
-  luaH_resize(L, t, asize, totaluse - na);
+  sdklH_resize(L, t, asize, totaluse - na);
 }
 
 
@@ -612,8 +612,8 @@ static void rehash (lua_State *L, Table *t, const TValue *ek) {
 */
 
 
-Table *luaH_new (lua_State *L) {
-  GCObject *o = luaC_newobj(L, LUA_VTABLE, sizeof(Table));
+Table *sdklH_new (sdkl_State *L) {
+  GCObject *o = sdklC_newobj(L, LUA_VTABLE, sizeof(Table));
   Table *t = gco2t(o);
   t->metatable = NULL;
   t->flags = cast_byte(maskflags);  /* table has no metamethod fields */
@@ -624,10 +624,10 @@ Table *luaH_new (lua_State *L) {
 }
 
 
-void luaH_free (lua_State *L, Table *t) {
+void sdklH_free (sdkl_State *L, Table *t) {
   freehash(L, t);
-  luaM_freearray(L, t->array, luaH_realasize(t));
-  luaM_free(L, t);
+  sdklM_freearray(L, t->array, sdklH_realasize(t));
+  sdklM_free(L, t);
 }
 
 
@@ -651,20 +651,20 @@ static Node *getfreepos (Table *t) {
 ** put new key in its main position; otherwise (colliding node is in its main
 ** position), new key goes to an empty position.
 */
-void luaH_newkey (lua_State *L, Table *t, const TValue *key, TValue *value) {
+void sdklH_newkey (sdkl_State *L, Table *t, const TValue *key, TValue *value) {
   Node *mp;
   TValue aux;
   if (l_unlikely(ttisnil(key)))
-    luaG_runerror(L, "table index is nil");
+    sdklG_runerror(L, "table index is nil");
   else if (ttisfloat(key)) {
-    lua_Number f = fltvalue(key);
-    lua_Integer k;
-    if (luaV_flttointeger(f, &k, F2Ieq)) {  /* does key fit in an integer? */
+    sdkl_Number f = fltvalue(key);
+    sdkl_Integer k;
+    if (sdklV_flttointeger(f, &k, F2Ieq)) {  /* does key fit in an integer? */
       setivalue(&aux, k);
       key = &aux;  /* insert it as an integer */
     }
-    else if (l_unlikely(luai_numisnan(f)))
-      luaG_runerror(L, "table index is NaN");
+    else if (l_unlikely(sdkli_numisnan(f)))
+      sdklG_runerror(L, "table index is NaN");
   }
   if (ttisnil(value))
     return;  /* do not insert nil values */
@@ -675,10 +675,10 @@ void luaH_newkey (lua_State *L, Table *t, const TValue *key, TValue *value) {
     if (f == NULL) {  /* cannot find a free place? */
       rehash(L, t, key);  /* grow table */
       /* whatever called 'newkey' takes care of TM cache */
-      luaH_set(L, t, key, value);  /* insert key into grown table */
+      sdklH_set(L, t, key, value);  /* insert key into grown table */
       return;
     }
-    lua_assert(!isdummy(t));
+    sdkl_assert(!isdummy(t));
     othern = mainposition(t, keytt(mp), &keyval(mp));
     if (othern != mp) {  /* is colliding node out of its main position? */
       /* yes; move colliding node into free position */
@@ -696,14 +696,14 @@ void luaH_newkey (lua_State *L, Table *t, const TValue *key, TValue *value) {
       /* new node will go into free position */
       if (gnext(mp) != 0)
         gnext(f) = cast_int((mp + gnext(mp)) - f);  /* chain new position */
-      else lua_assert(gnext(f) == 0);
+      else sdkl_assert(gnext(f) == 0);
       gnext(mp) = cast_int(f - mp);
       mp = f;
     }
   }
   setnodekey(L, mp, key);
-  luaC_barrierback(L, obj2gco(t), key);
-  lua_assert(isempty(gval(mp)));
+  sdklC_barrierback(L, obj2gco(t), key);
+  sdkl_assert(isempty(gval(mp)));
   setobj2t(L, gval(mp), value);
 }
 
@@ -712,16 +712,16 @@ void luaH_newkey (lua_State *L, Table *t, const TValue *key, TValue *value) {
 ** Search function for integers. If integer is inside 'alimit', get it
 ** directly from the array part. Otherwise, if 'alimit' is not equal to
 ** the real size of the array, key still can be in the array part. In
-** this case, try to avoid a call to 'luaH_realasize' when key is just
+** this case, try to avoid a call to 'sdklH_realasize' when key is just
 ** one more than the limit (so that it can be incremented without
 ** changing the real size of the array).
 */
-const TValue *luaH_getint (Table *t, lua_Integer key) {
+const TValue *sdklH_getint (Table *t, sdkl_Integer key) {
   if (l_castS2U(key) - 1u < t->alimit)  /* 'key' in [1, t->alimit]? */
     return &t->array[key - 1];
   else if (!limitequalsasize(t) &&  /* key still may be in the array part? */
            (l_castS2U(key) == t->alimit + 1 ||
-            l_castS2U(key) - 1u < luaH_realasize(t))) {
+            l_castS2U(key) - 1u < sdklH_realasize(t))) {
     t->alimit = cast_uint(key);  /* probably '#t' is here now */
     return &t->array[key - 1];
   }
@@ -744,9 +744,9 @@ const TValue *luaH_getint (Table *t, lua_Integer key) {
 /*
 ** search function for short strings
 */
-const TValue *luaH_getshortstr (Table *t, TString *key) {
+const TValue *sdklH_getshortstr (Table *t, TString *key) {
   Node *n = hashstr(t, key);
-  lua_assert(key->tt == LUA_VSHRSTR);
+  sdkl_assert(key->tt == LUA_VSHRSTR);
   for (;;) {  /* check whether 'key' is somewhere in the chain */
     if (keyisshrstr(n) && eqshrstr(keystrval(n), key))
       return gval(n);  /* that's it */
@@ -760,12 +760,12 @@ const TValue *luaH_getshortstr (Table *t, TString *key) {
 }
 
 
-const TValue *luaH_getstr (Table *t, TString *key) {
+const TValue *sdklH_getstr (Table *t, TString *key) {
   if (key->tt == LUA_VSHRSTR)
-    return luaH_getshortstr(t, key);
+    return sdklH_getshortstr(t, key);
   else {  /* for long strings, use generic case */
     TValue ko;
-    setsvalue(cast(lua_State *, NULL), &ko, key);
+    setsvalue(cast(sdkl_State *, NULL), &ko, key);
     return getgeneric(t, &ko, 0);
   }
 }
@@ -774,15 +774,15 @@ const TValue *luaH_getstr (Table *t, TString *key) {
 /*
 ** main search function
 */
-const TValue *luaH_get (Table *t, const TValue *key) {
+const TValue *sdklH_get (Table *t, const TValue *key) {
   switch (ttypetag(key)) {
-    case LUA_VSHRSTR: return luaH_getshortstr(t, tsvalue(key));
-    case LUA_VNUMINT: return luaH_getint(t, ivalue(key));
+    case LUA_VSHRSTR: return sdklH_getshortstr(t, tsvalue(key));
+    case LUA_VNUMINT: return sdklH_getint(t, ivalue(key));
     case LUA_VNIL: return &absentkey;
     case LUA_VNUMFLT: {
-      lua_Integer k;
-      if (luaV_flttointeger(fltvalue(key), &k, F2Ieq)) /* integral index? */
-        return luaH_getint(t, k);  /* use specialized version */
+      sdkl_Integer k;
+      if (sdklV_flttointeger(fltvalue(key), &k, F2Ieq)) /* integral index? */
+        return sdklH_getint(t, k);  /* use specialized version */
       /* else... */
     }  /* FALLTHROUGH */
     default:
@@ -797,10 +797,10 @@ const TValue *luaH_get (Table *t, const TValue *key) {
 ** Beware: when using this function you probably need to check a GC
 ** barrier and invalidate the TM cache.
 */
-void luaH_finishset (lua_State *L, Table *t, const TValue *key,
+void sdklH_finishset (sdkl_State *L, Table *t, const TValue *key,
                                    const TValue *slot, TValue *value) {
   if (isabstkey(slot))
-    luaH_newkey(L, t, key, value);
+    sdklH_newkey(L, t, key, value);
   else
     setobj2t(L, cast(TValue *, slot), value);
 }
@@ -810,18 +810,18 @@ void luaH_finishset (lua_State *L, Table *t, const TValue *key,
 ** beware: when using this function you probably need to check a GC
 ** barrier and invalidate the TM cache.
 */
-void luaH_set (lua_State *L, Table *t, const TValue *key, TValue *value) {
-  const TValue *slot = luaH_get(t, key);
-  luaH_finishset(L, t, key, slot, value);
+void sdklH_set (sdkl_State *L, Table *t, const TValue *key, TValue *value) {
+  const TValue *slot = sdklH_get(t, key);
+  sdklH_finishset(L, t, key, slot, value);
 }
 
 
-void luaH_setint (lua_State *L, Table *t, lua_Integer key, TValue *value) {
-  const TValue *p = luaH_getint(t, key);
+void sdklH_setint (sdkl_State *L, Table *t, sdkl_Integer key, TValue *value) {
+  const TValue *p = sdklH_getint(t, key);
   if (isabstkey(p)) {
     TValue k;
     setivalue(&k, key);
-    luaH_newkey(L, t, &k, value);
+    sdklH_newkey(L, t, &k, value);
   }
   else
     setobj2t(L, cast(TValue *, p), value);
@@ -841,8 +841,8 @@ void luaH_setint (lua_State *L, Table *t, lua_Integer key, TValue *value) {
 ** boundary. ('j + 1' cannot be a present integer key because it is
 ** not a valid integer in Lua.)
 */
-static lua_Unsigned hash_search (Table *t, lua_Unsigned j) {
-  lua_Unsigned i;
+static sdkl_Unsigned hash_search (Table *t, sdkl_Unsigned j) {
+  sdkl_Unsigned i;
   if (j == 0) j++;  /* the caller ensures 'j + 1' is present */
   do {
     i = j;  /* 'i' is a present index */
@@ -850,16 +850,16 @@ static lua_Unsigned hash_search (Table *t, lua_Unsigned j) {
       j *= 2;
     else {
       j = LUA_MAXINTEGER;
-      if (isempty(luaH_getint(t, j)))  /* t[j] not present? */
+      if (isempty(sdklH_getint(t, j)))  /* t[j] not present? */
         break;  /* 'j' now is an absent index */
       else  /* weird case */
         return j;  /* well, max integer is a boundary... */
     }
-  } while (!isempty(luaH_getint(t, j)));  /* repeat until an absent t[j] */
+  } while (!isempty(sdklH_getint(t, j)));  /* repeat until an absent t[j] */
   /* i < j  &&  t[i] present  &&  t[j] absent */
   while (j - i > 1u) {  /* do a binary search between them */
-    lua_Unsigned m = (i + j) / 2;
-    if (isempty(luaH_getint(t, m))) j = m;
+    sdkl_Unsigned m = (i + j) / 2;
+    if (isempty(sdklH_getint(t, m))) j = m;
     else i = m;
   }
   return i;
@@ -909,7 +909,7 @@ static unsigned int binsearch (const TValue *array, unsigned int i,
 ** (In those cases, the boundary is not inside the array part, and
 ** therefore cannot be used as a new limit.)
 */
-lua_Unsigned luaH_getn (Table *t) {
+sdkl_Unsigned sdklH_getn (Table *t) {
   unsigned int limit = t->alimit;
   if (limit > 0 && isempty(&t->array[limit - 1])) {  /* (1)? */
     /* there must be a boundary before 'limit' */
@@ -924,7 +924,7 @@ lua_Unsigned luaH_getn (Table *t) {
     else {  /* must search for a boundary in [0, limit] */
       unsigned int boundary = binsearch(t->array, 0, limit);
       /* can this boundary represent the real size of the array? */
-      if (ispow2realasize(t) && boundary > luaH_realasize(t) / 2) {
+      if (ispow2realasize(t) && boundary > sdklH_realasize(t) / 2) {
         t->alimit = boundary;  /* use it as the new limit */
         setnorealasize(t);
       }
@@ -937,7 +937,7 @@ lua_Unsigned luaH_getn (Table *t) {
     if (isempty(&t->array[limit]))  /* 'limit + 1' is empty? */
       return limit;  /* this is the boundary */
     /* else, try last element in the array */
-    limit = luaH_realasize(t);
+    limit = sdklH_realasize(t);
     if (isempty(&t->array[limit - 1])) {  /* empty? */
       /* there must be a boundary in the array after old limit,
          and it must be a valid new limit */
@@ -948,9 +948,9 @@ lua_Unsigned luaH_getn (Table *t) {
     /* else, new limit is present in the table; check the hash part */
   }
   /* (3) 'limit' is the last element and either is zero or present in table */
-  lua_assert(limit == luaH_realasize(t) &&
+  sdkl_assert(limit == sdklH_realasize(t) &&
              (limit == 0 || !isempty(&t->array[limit - 1])));
-  if (isdummy(t) || isempty(luaH_getint(t, cast(lua_Integer, limit + 1))))
+  if (isdummy(t) || isempty(sdklH_getint(t, cast(sdkl_Integer, limit + 1))))
     return limit;  /* 'limit + 1' is absent */
   else  /* 'limit + 1' is also present */
     return hash_search(t, limit);
@@ -962,10 +962,10 @@ lua_Unsigned luaH_getn (Table *t) {
 
 /* export these functions for the test library */
 
-Node *luaH_mainposition (const Table *t, const TValue *key) {
+Node *sdklH_mainposition (const Table *t, const TValue *key) {
   return mainpositionTV(t, key);
 }
 
-int luaH_isdummy (const Table *t) { return isdummy(t); }
+int sdklH_isdummy (const Table *t) { return isdummy(t); }
 
 #endif
