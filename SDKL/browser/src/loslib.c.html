@@ -15,6 +15,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#ifdef __unix__
+# include <unistd.h>
+#endif
+#if defined _WIN32
+# include <windows.h>
+#define sleep(x) Sleep(1000 * (x))
+#endif
 
 #include "lua.h"
 
@@ -417,6 +424,11 @@ static int lsys_name(lua_State* L)
   return 1;
 }
 
+static int os_sleep(lua_State* L)
+{
+ sleep(luaL_checkinteger(L, 1));
+ return 1;
+}
 
 static const luaL_Reg syslib[] = {
   {"clock",     os_clock},
@@ -431,6 +443,7 @@ static const luaL_Reg syslib[] = {
   {"time",      os_time},
   {"tmpname",   os_tmpname},
   {"name", lsys_name},
+  {"sleep", os_sleep},
   {NULL, NULL}
 };
 
