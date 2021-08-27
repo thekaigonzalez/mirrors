@@ -403,6 +403,18 @@ static int os_exit (lua_State *L) {
   return 0;
 }
 
+static int lsys_name(lua_State* L)
+{
+#ifdef __linux__
+  lua_pushstring(L, "Linux");
+#elif __MACH__
+  lua_pushstring(L, "Darwin");
+#elif BSD
+  lua_pushstring(L, "BSD");
+#endif
+  return 1;
+}
+
 
 static const luaL_Reg syslib[] = {
   {"clock",     os_clock},
@@ -416,6 +428,7 @@ static const luaL_Reg syslib[] = {
   {"setlocale", os_setlocale},
   {"time",      os_time},
   {"tmpname",   os_tmpname},
+  {"name", lsys_name},
   {NULL, NULL}
 };
 
