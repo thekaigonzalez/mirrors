@@ -411,6 +411,8 @@ static int lsys_name(lua_State* L)
   lua_pushstring(L, "Darwin");
 #elif BSD
   lua_pushstring(L, "BSD");
+#elif _WIN32
+  lua_pushstring(L, "Windows");
 #endif
   return 1;
 }
