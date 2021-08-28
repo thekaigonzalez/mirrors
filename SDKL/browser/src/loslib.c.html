@@ -67,7 +67,7 @@
 */
 
 /*
-** type to represent time_t in Lua
+** type to represent time_t in SDKL
 */
 #if !defined(LUA_NUMTIME)	/* { */
 
@@ -86,7 +86,7 @@
 
 #if !defined(l_gmtime)		/* { */
 /*
-** By default, Lua uses gmtime/localtime, except when POSIX is available,
+** By default, SDKL uses gmtime/localtime, except when POSIX is available,
 ** where it uses gmtime_r/localtime_r
 */
 
@@ -111,7 +111,7 @@
 /*
 ** {==================================================================
 ** Configuration for 'tmpnam':
-** By default, Lua uses tmpnam except when POSIX is available, where
+** By default, SDKL uses tmpnam except when POSIX is available, where
 ** it uses mkstemp.
 ** ===================================================================
 */
@@ -159,6 +159,13 @@ static int os_execute (sdkl_State *L) {
   }
 }
 
+static int os_code(sdkl_State* L)
+{
+  int stat;
+  stat = system(sdklL_checkstring(L, 1));
+  sdkl_pushinteger(L, stat);
+  return 1;
+}
 
 static int os_remove (sdkl_State *L) {
   const char *filename = sdklL_checkstring(L, 1);
@@ -436,6 +443,7 @@ static const sdklL_Reg syslib[] = {
   {"difftime",  os_difftime},
   {"execute",   os_execute},
   {"exit",      os_exit},
+  {"code", os_code},
   {"getenv",    os_getenv},
   {"remove",    os_remove},
   {"rename",    os_rename},

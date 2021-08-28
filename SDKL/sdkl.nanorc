@@ -5,6 +5,8 @@ magic "SDKL-Lua script"
 comment "--"
 color brightred "\<[A-Z_][0-9A-Z_]+\>"
 
+color brightred "\<ifeq\>"
+
 linter luacheck --no-color
 
 color brightwhite "\[\[.*\]\]"
