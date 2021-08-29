@@ -3,6 +3,7 @@
 syntax lua "\.(lua|sl|sdkl)$"
 magic "SDKL-Lua script"
 comment "--"
+comment "//"
 color brightred "\<[A-Z_][0-9A-Z_]+\>"
 
 color brightred "\<ifeq\>"
